@@ -1,0 +1,6 @@
+paraceptamol, 210
+Amoxicillin, 5
+Vitamin C, 12
+Insulin, 8
+gloves, 60
+vitamin, -5

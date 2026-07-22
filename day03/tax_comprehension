@@ -1,0 +1,4 @@
+prices = [100, 250, 400, 80]
+
+tax_prices = [round(price*1.15, 2) for price in prices]
+print(tax_prices)
