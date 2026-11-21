@@ -1,0 +1,67 @@
+@baseUrl = http://127.0.0.1:8000/api/v1
+
+### 1. List all dishes (cheapest first — 200 OK)
+GET {{baseUrl}}/dishes
+Accept: application/json
+
+### 2. Filter dishes by area (200 OK)
+GET {{baseUrl}}/dishes?area=Bole
+Accept: application/json
+
+### 3. Filter dishes by max_price in santim (200 OK)
+GET {{baseUrl}}/dishes?max_price=25000
+Accept: application/json
+
+### 4. Filter dishes by fasting flag (200 OK)
+GET {{baseUrl}}/dishes?fasting=1
+Accept: application/json
+
+### 5. Combined filters: area + fasting (200 OK)
+GET {{baseUrl}}/dishes?area=Bole&fasting=1
+Accept: application/json
+
+### 6. Show one dish by numeric ID (200 OK)
+GET {{baseUrl}}/dishes/1
+Accept: application/json
+
+### 7. Missing dish ID (404 Not Found)
+GET {{baseUrl}}/dishes/9999
+Accept: application/json
+
+### 8. Create a new dish (201 Created + Location header)
+POST {{baseUrl}}/dishes
+Content-Type: application/json
+Accept: application/json
+
+{
+  "name": "Special Kitfo",
+  "restaurant": "Yod Abyssinia",
+  "price": 48000,
+  "is_fasting": false,
+  "area": "Bole"
+}
+
+### 9. Update dish #1 (200 OK)
+PATCH {{baseUrl}}/dishes/1
+Content-Type: application/json
+Accept: application/json
+
+{
+  "price": 26500
+}
+
+### 10. Delete dish #41 (204 No Content)
+DELETE {{baseUrl}}/dishes/41
+Accept: application/json
+
+### 11. Method not allowed check (405 Method Not Allowed)
+DELETE {{baseUrl}}/dishes
+Accept: application/json
+
+### 12. List all restaurants (200 OK)
+GET {{baseUrl}}/restaurants
+Accept: application/json
+
+### 13. Show one restaurant by slug (200 OK)
+GET {{baseUrl}}/restaurants/yod-abyssinia
+Accept: application/json
