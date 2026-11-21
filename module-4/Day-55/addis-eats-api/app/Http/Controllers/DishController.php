@@ -21,19 +21,37 @@ class DishController extends Controller
         $query->when($request->boolean('fasting'), fn ($q) =>
             $q->where('is_fasting', true));
 
-        return DishResource::collection($query->orderBy('price')->get());
+        $query->when($request->filled('restaurant'), fn ($q) =>
+            $q->where('restaurant', $request->query('restaurant')));
+
+        $query->when($request->filled('search'), fn ($q) =>
+            $q->where('name', 'LIKE', '%' . $request->query('search') . '%'));
+
+        match ($request->query('sort')) {
+            'price_desc' => $query->orderBy('price', 'desc'),
+            'name'       => $query->orderBy('name', 'asc'),
+            default      => $query->orderBy('price', 'asc'),
+        };
+
+        $perPage = min(max((int) $request->query('per_page', 5), 1), 50);
+
+        return DishResource::collection($query->paginate($perPage)->withQueryString());
     }
 
     public function store(Request $request)
     {
-        // Only whitelisted keys are read — never $request->all()
-        $dish = Dish::create($request->only([
-            'name',
-            'restaurant',
-            'price',
-            'is_fasting',
-            'area',
-        ]));
+       $validated = $request->validate([
+            'name'       => 'required|string|max:255',
+            'restaurant' => 'required|string|max:255',
+            'price'      => 'required|integer|min:100',
+            'is_fasting' => 'required|boolean',
+            'area'       => 'required|string|max:100',
+       ],
+       [
+         'price.min' => 'The price must be a positive amount of at least 100 santim (1.00 ETB).',
+       ]);
+
+        $dish = Dish::create($validated);
 
         return (new DishResource($dish))
             ->response()
@@ -48,13 +66,15 @@ class DishController extends Controller
 
     public function update(Request $request, Dish $dish)
     {
-        $dish->update($request->only([
-            'name',
-            'restaurant',
-            'price',
-            'is_fasting',
-            'area',
-        ]));
+        $validated = $request->validate([
+            'name'       => 'sometimes|required|string|max:255',
+            'restaurant' => 'sometimes|required|string|max:255',
+            'price'      => 'sometimes|required|integer|min:100',
+            'is_fasting' => 'sometimes|required|boolean',
+            'area'       => 'sometimes|required|string|max:100',
+        ]);
+
+        $dish->update($validated);
 
         return new DishResource($dish);
     }

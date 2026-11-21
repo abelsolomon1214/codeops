@@ -15,4 +15,8 @@ Route::prefix('v1')->group(function () {
 
     Route::get('/restaurants/{restaurant:slug}', [RestaurantController::class, 'show'])
         ->name('restaurants.show');
+
+    // New: Full menu for a specific restaurant by slug
+    Route::get('/restaurants/{restaurant:slug}/dishes', [RestaurantController::class, 'dishes'])
+        ->name('restaurants.dishes');
 });
