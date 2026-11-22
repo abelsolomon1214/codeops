@@ -1,0 +1,75 @@
+@baseUrl = http://127.0.0.1:8000/api/v1
+
+### 1. 422 Validation Failed: Negative price & unserved area on dish
+POST {{baseUrl}}/dishes
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "",
+  "restaurant_id": 1,
+  "price": -500,
+  "is_fasting": true,
+  "area": "Sululta"
+}
+
+### 2. 422 Validation Failed: Invalid TeleBirr phone number on restaurant
+POST {{baseUrl}}/restaurants
+Accept: application/json
+Content-Type: application/json
+
+{
+  "name": "Test Kitchen",
+  "slug": "test-kitchen",
+  "area": "Bole",
+  "phone": "12345",
+  "opening_hours": "08:00 - 22:00"
+}
+
+### 3. 422 Validation Failed: Empty order lines & nonexistent dish_id
+POST {{baseUrl}}/orders
+Accept: application/json
+Content-Type: application/json
+
+{
+  "area": "Bole",
+  "phone": "0911234567",
+  "lines": [
+    { "dish_id": 999999, "qty": 0 }
+  ]
+}
+
+### 4. 201 Created: Valid order with +251 phone normalization
+POST {{baseUrl}}/orders
+Accept: application/json
+Content-Type: application/json
+
+{
+  "area": "Bole",
+  "phone": "+251 911-234-567",
+  "notes": "Call on arrival",
+  "lines": [
+    { "dish_id": 1, "qty": 2 }
+  ]
+}
+
+### 5. 409 Conflict: Illegal order status transition (placed -> delivered skips preparing/dispatched)
+PATCH {{baseUrl}}/orders/16/status
+Accept: application/json
+Content-Type: application/json
+
+{
+  "status": "delivered"
+}
+
+### 6. 404 Not Found: Missing dish ID
+GET {{baseUrl}}/dishes/999999
+Accept: application/json
+
+### 7. 404 Route Not Found: Unknown endpoint
+GET {{baseUrl}}/unknown-endpoint
+Accept: application/json
+
+### 8. 405 Method Not Allowed: PATCH on collection route
+PATCH {{baseUrl}}/orders
+Accept: application/json
